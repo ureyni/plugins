@@ -1,9 +1,7 @@
-#!/usr/local/bin/php
 <?php
 
 /*
- * Copyright (C) 2024 Hasan Ucak <hasan@sunnyvalley.io>
- * All rights reserved.
+ * Copyright (C) 2024 Frank Wall
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,21 +25,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once 'util.inc';
+namespace OPNsense\AcmeClient\LeValidation;
 
-$conf = '/usr/local/etc/pkg/repos/SunnyValley.conf';
+use OPNsense\AcmeClient\LeValidationInterface;
+use OPNsense\Core\Config;
 
-if (!file_exists($conf . '.sample')) {
-    exit(0);
-}
-
-$fileContents = file_get_contents($conf . '.sample');
-
-if (file_exists('/usr/local/zenarmor/bin/eastpect')) {
-    $uuid = shell_safe('/usr/local/zenarmor/bin/eastpect -s');
-    if ($uuid != '') {
-        $fileContents = str_replace('/latest"', '/' . $uuid . '"', $fileContents);
+/**
+ * Constellix API
+ * @package OPNsense\AcmeClient
+ */
+class DnsConstellix extends Base implements LeValidationInterface
+{
+    public function prepare()
+    {
+        $this->acme_env['CONSTELLIX_Key'] = (string)$this->config->dns_constellix_key;
+        $this->acme_env['CONSTELLIX_Secret'] = (string)$this->config->dns_constellix_secret;
     }
 }
-
-file_put_contents($conf, $fileContents);
